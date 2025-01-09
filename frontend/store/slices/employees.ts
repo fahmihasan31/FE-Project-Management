@@ -15,18 +15,19 @@ const InitialState: EmployeeState = {
 
 export const getEmployees = createAsyncThunk('api/getEmployees', async (payload: any) => {
     const res = await Services.getEmployees(payload);
-    return res.data.data;
+    console.log('res employee get', res);
+    return res.data.result;
 });
 
 export const postEmployees = createAsyncThunk('api/postEmployees', async (payload: any) => {
     const res = await Services.postEmployees(payload);
-    return res.data.data;
+    return res.data.result;
 });
 
 export const putEmployees = createAsyncThunk('api/putEmployees', async ({ payload, id }: { payload: any; id: number }) => {
     const res = await Services.putEmployees(payload, id);
     console.log('update data', res);
-    return res.data.data;
+    return res.data.result;
 });
 
 export const deleteEmployees = createAsyncThunk('api/deleteEmployees', async (id: number) => {

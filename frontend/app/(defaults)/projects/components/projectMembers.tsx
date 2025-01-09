@@ -10,7 +10,7 @@ interface ProjectTeamProps {
 const ProjectTeam = ({ formData, setFormData }: ProjectTeamProps) => {
     const dispatch = useAppDispatch();
     const EmployeesState = useAppSelector((state) => state.Employees);
-    const [selectedTeam, setSelectedTeam] = useState<{ id: string; role: string }[]>(formData.team || []);
+    const [selectedTeam, setSelectedTeam] = useState<{ id: string; role: string }[]>(formData.member || []);
     const [filteredEmployees, setFilteredEmployees] = useState<any[]>([]);
 
     useEffect(() => {

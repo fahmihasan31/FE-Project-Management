@@ -83,7 +83,7 @@ const Skills = () => {
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Search Employee..."
+                            placeholder="Search Skill..."
                             value={searchTerm}
                             onChange={handleSearch}
                             className="rounded-lg border px-4 py-2 pl-10 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"

@@ -143,7 +143,8 @@ const Employees = () => {
                                                 .map((skill: EmployeeSkill, index: number) => (
                                                     <span key={skill.id || index} className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getRateColor(skill.rate)}`}>
                                                         <span className="truncate">{skill.master_skill?.name || 'Unknown'}</span>
-                                                        <span className="ml-2 text-xs font-semibold">{skill.rate}</span>
+                                                        <FaStar size={10} className="ml-2" />
+                                                        <span className="ml-1 text-xs font-semibold">{skill.rate}</span>
                                                     </span>
                                                 ))}
                                         </div>

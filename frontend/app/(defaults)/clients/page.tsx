@@ -13,6 +13,7 @@ interface ClientProps {
     name: string;
     address: string;
     phone_number: string;
+    project: string;
 }
 
 const Clients = () => {

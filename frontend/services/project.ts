@@ -1,14 +1,23 @@
 import api from './http/api';
 
+export interface ProjectPayload {
+    name: string;
+    description: string;
+    schedule_start: string;
+    schedule_end: string;
+    amount: number;
+    client_id: string;
+}
+
 export default {
     // Projects
-    getProjects: async (payload: any) => {
+    getProjects: async (payload: ProjectPayload) => {
         return await api.get('/project/', { params: payload });
     },
-    postProject: async (payload: any) => {
+    postProject: async (payload: ProjectPayload) => {
         return await api.post('/project/', payload);
     },
-    putProject: async (payload: any, id: number) => {
+    putProject: async (payload: ProjectPayload, id: number) => {
         return await api.put(`/project/${id}`, payload);
     },
     deleteProject: async (id: number) => {

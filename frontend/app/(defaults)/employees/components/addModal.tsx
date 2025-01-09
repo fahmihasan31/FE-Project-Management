@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hook/redux-hook';
 import { postEmployees } from '@/store/slices/employees';
 import { getSkills } from '@/store/slices/skills';
+import { getEmployees } from '@/store/slices/employees';
 import { toast } from 'react-toastify';
 
 interface AddModalProps {
@@ -113,7 +114,7 @@ const AddModal = ({ isOpen, onClose }: AddModalProps) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="relative w-full max-w-3xl overflow-hidden rounded-lg bg-white p-6 shadow-lg dark:border-neutral-800 dark:bg-neutral-800">
                 <div className="mb-4 flex items-center justify-between rounded-t border-b pb-4 dark:border-gray-600 sm:mb-5">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Update Employee</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Add Employee</h3>
                     <button
                         type="button"
                         className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"

@@ -15,17 +15,17 @@ const InitialState: SkillState = {
 
 export const getSkills = createAsyncThunk('api/getSkills', async (payload: any) => {
     const res = await Services.getSkills(payload);
-    return res.data.data;
+    return res.data.result;
 });
 
 export const postSkills = createAsyncThunk('api/postSkills', async (payload: any) => {
     const res = await Services.postSkills(payload);
-    return res.data.data;
+    return res.data.result;
 });
 
 export const putSkills = createAsyncThunk('api/putSkills', async ({ payload, id }: { payload: any; id: number }) => {
     const res = await Services.putSkills(payload, id);
-    return res.data.data;
+    return res.data.result;
 });
 
 export const deleteSkills = createAsyncThunk('api/deleteSkills', async (id: number) => {

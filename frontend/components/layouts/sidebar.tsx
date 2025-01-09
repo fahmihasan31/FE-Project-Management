@@ -18,6 +18,9 @@ import IconMenuPages from '@/components/icon/menu/icon-menu-pages';
 import IconMenuAuthentication from '@/components/icon/menu/icon-menu-authentication';
 import { usePathname } from 'next/navigation';
 import { getTranslation } from '@/i18n';
+import { useRouter } from 'next/navigation';
+import { logout } from '@/store/slices/auth';
+import { toast } from 'react-toastify';
 
 const Sidebar = () => {
     const dispatch = useDispatch();
@@ -65,6 +68,19 @@ const Sidebar = () => {
         }
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
         selector?.classList.add('active');
+    };
+
+    const router = useRouter();
+    const handleLogout = async () => {
+        try {
+            dispatch(logout);
+            toast.success('You have successfully logout!');
+            setTimeout(() => {
+                router.push('/login');
+            }, 1500);
+        } catch (error) {
+            console.error('Error during login:', error);
+        }
     };
 
     return (
@@ -323,7 +339,9 @@ const Sidebar = () => {
                                 <Link href="/login" className="group active:bg-blue-600">
                                     <div className="flex items-center">
                                         <IconMenuUsers className="shrink-0 group-hover:!text-primary" />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('logout')}</span>
+                                        <span onClick={handleLogout} className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
+                                            {t('logout')}
+                                        </span>
                                     </div>
                                 </Link>
                             </li>

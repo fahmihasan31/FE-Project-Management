@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Services from '@/services/project';
 
 interface ProjectState {
+    membersByRequirement: any;
     loading: boolean;
     data: any[];
     error: string | null;
@@ -11,45 +12,47 @@ const InitialState: ProjectState = {
     loading: false,
     data: [],
     error: null,
+    membersByRequirement: [],
 };
 
 // Async thunks master project
 export const getProjects = createAsyncThunk('api/getProjects', async (payload: any) => {
     const res = await Services.getProjects(payload);
-    return res.data.data;
+    console.log('respon project get', res);
+    return res.data.result;
 });
 export const postProject = createAsyncThunk('api/postProject', async (payload: any) => {
     const res = await Services.postProject(payload);
-    console.log('res post', res);
-    return res.data.data;
+    return res.data.result;
 });
 export const putProject = createAsyncThunk('api/putProject', async ({ payload, id }: { payload: any; id: number }) => {
     const res = await Services.putProject(payload, id);
-    return res.data.data;
+    console.log('put project', res);
+    return res.data.result;
 });
 export const deleteProject = createAsyncThunk('api/deleteProject', async (id: number) => {
     const res = await Services.deleteProject(id);
-    return res.data.data;
+    return res.data.result;
 });
 
 // Async thunks document project
 export const addDocument = createAsyncThunk('api/project/addDocument', async (payload: any) => {
     const res = await Services.addDocument(payload);
-    return res.data.data;
+    return res.data.result;
 });
 export const getDocumentsByProject = createAsyncThunk('api/project/getDocumentsByProject', async (id: number) => {
     const response = await Services.getDocumentsByProject(id);
-    return response.data;
+    return response.data.result;
 });
 export const deleteDocument = createAsyncThunk('api/deleteDocument', async (id: number) => {
     const res = await Services.deleteDocument(id);
-    return res.data.data;
+    return res.data.result;
 });
 
 // Async thunks requirement project
 export const addRequirement = createAsyncThunk('api/project/addRequirement', async (payload: any) => {
     const res = await Services.addRequirement(payload);
-    return res.data.data;
+    return res.data.result;
 });
 export const getRequirementsByProject = createAsyncThunk('api/project/getRequirementsByProject', async (id: number) => {
     const response = await Services.getRequirementsByProject(id);
@@ -57,13 +60,13 @@ export const getRequirementsByProject = createAsyncThunk('api/project/getRequire
 });
 export const deleteRequirement = createAsyncThunk('api/deleteRequirement', async (id: number) => {
     const res = await Services.deleteRequirement(id);
-    return res.data.data;
+    return res.data.result;
 });
 
 // Async thunks member project
 export const addMember = createAsyncThunk('api/project/addMember', async (payload: any) => {
     const res = await Services.addMember(payload);
-    return res.data.data;
+    return res.data.result;
 });
 export const getMembersByProject = createAsyncThunk('api/project/getMembersByProject', async (id: number) => {
     const response = await Services.getMembersByProject(id);
@@ -71,7 +74,8 @@ export const getMembersByProject = createAsyncThunk('api/project/getMembersByPro
 });
 export const getMembersByRequirement = createAsyncThunk('api/project/getMembersByRequirement', async (id: number) => {
     const response = await Services.getMembersByRequirement(id);
-    return response.data;
+    console.log('res get member by requirement', response);
+    return response.data.result;
 });
 export const deleteMember = createAsyncThunk('api/deleteMember', async (id: number) => {
     const res = await Services.deleteMember(id);

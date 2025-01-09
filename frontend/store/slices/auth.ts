@@ -14,20 +14,23 @@ const InitialState: AuthState = {
 };
 
 // Thunk untuk login
-export const login = createAsyncThunk('auth/login', async (payload: { email: string; password: string }, { rejectWithValue }) => {
+export const login = createAsyncThunk('auth/login', async (payload: any, { rejectWithValue }) => {
     try {
         const response = await Services.login(payload);
 
-        if (response.data && response.data.token) {
-            const { token, user } = response.data;
+        console.log('API Response:', response);
 
+        if (response.data && response.data.data && response.data.data.token) {
+            const { token } = response.data.data;
+            console.log('Token:', token);
             localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
+        } else {
+            console.error('Token is missing in the response data');
         }
 
         return response.data.data;
     } catch (error: any) {
-        return rejectWithValue(error.response?.data?.message || 'Login failed, Invalid email or password');
+        return rejectWithValue(error.response?.data?.message || 'Login failed, invalid email or password');
     }
 });
 
@@ -37,8 +40,7 @@ const AuthSlices = createSlice({
     reducers: {
         logout(state) {
             state.user = null;
-            localStorage.removeItem('token'); // Hapus token dari localStorage
-            localStorage.removeItem('user'); // Hapus data user dari localStorage
+            localStorage.removeItem('token');
         },
     },
     extraReducers: (builder) => {

@@ -15,22 +15,22 @@ const InitialState: ClientState = {
 
 export const getClients = createAsyncThunk('api/getClients', async (payload: any) => {
     const res = await Services.getClients(payload);
-    return res.data.data;
+    return res.data.result;
 });
 
 export const postClients = createAsyncThunk('api/postClients', async (payload: any) => {
     const res = await Services.postClients(payload);
-    return res.data.data;
+    return res.data.result;
 });
 
 export const putClients = createAsyncThunk('api/putClients', async ({ payload, id }: { payload: any; id: number }) => {
     const res = await Services.putClients(payload, id);
-    return res.data.data;
+    return res.data.result;
 });
 
 export const deleteClients = createAsyncThunk('api/deleteClients', async (id: number) => {
     const res = await Services.deleteClients(id);
-    return res.data.data;
+    return res.data.result;
 });
 
 const ClientsSlices = createSlice({
@@ -50,7 +50,7 @@ const ClientsSlices = createSlice({
             })
             .addCase(getClients.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message || 'Failed to fetch clients';
+                state.error = action.error.message || 'Failed to get clients';
             })
             .addCase(postClients.pending, (state) => {
                 state.loading = true;
@@ -59,6 +59,7 @@ const ClientsSlices = createSlice({
             .addCase(postClients.fulfilled, (state, action) => {
                 state.loading = false;
                 state.data.push(action.payload);
+
                 state.error = null;
             })
             .addCase(postClients.rejected, (state, action) => {

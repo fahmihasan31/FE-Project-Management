@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hook/redux-hook';
 import { login } from '@/store/slices/auth';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -17,30 +17,23 @@ const LoginForm = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (authState.loading) return;
+
         try {
             const result = await dispatch(login({ email, password }));
             if (result.meta.requestStatus === 'fulfilled') {
-                toast.success('Anda berhasil login');
+                toast.success('You have successfully logged in!');
                 setTimeout(() => {
                     router.push('/');
                 }, 1500);
             } else {
-                toast.error('Login failed, please try again');
+                toast.error(authState.error || 'Login failed, please try again');
             }
         } catch (error) {
             console.error('Error during login:', error);
             toast.error('An unexpected error occurred. Please try again.');
         }
     };
-
-    useEffect(() => {
-        if (authState.user) {
-            toast.info('Redirecting...');
-            setTimeout(() => {
-                router.push('/');
-            }, 1500);
-        }
-    }, [authState.user, router]);
 
     return (
         <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800 sm:p-6 md:p-8">
