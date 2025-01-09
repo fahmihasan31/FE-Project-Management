@@ -19,6 +19,12 @@ export const getEmployees = createAsyncThunk('api/getEmployees', async (payload:
     return res.data.result;
 });
 
+export const getBySkillID = createAsyncThunk('api/getBySkillID', async (payload: any) => {
+    const res = await Services.getBySkillID(payload);
+    console.log('res employee get', res);
+    return res.data.result;
+});
+
 export const postEmployees = createAsyncThunk('api/postEmployees', async (payload: any) => {
     const res = await Services.postEmployees(payload);
     return res.data.result;
@@ -42,6 +48,10 @@ const EmployeesSlices = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(getEmployees.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getBySkillID.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })

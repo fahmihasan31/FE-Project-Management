@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/hook/redux-hook';
+import { getSkills } from '@/store/slices/skills';
+import { getEmployees } from '@/store/slices/employees';
+import { FaStar } from 'react-icons/fa';
 import Select from 'react-select';
 
 type SkillOption = {
@@ -7,83 +11,72 @@ type SkillOption = {
 };
 
 type Employee = {
+    id: number;
     name: string;
     skills: {
+        id: string;
         name: string;
         rate: number;
+        master_skill: {
+            id: string;
+            name: string;
+        };
     }[];
 };
 
+const getRateColor = (rate: number) => {
+    if (rate <= 6) return 'bg-red-100 text-red-700';
+    if (rate <= 8) return 'bg-yellow-100 text-yellow-700';
+    return 'bg-green-100 text-green-700';
+};
+
 const SkillRequirementTabContent = () => {
+    const dispatch = useAppDispatch();
+    const skills = useAppSelector((state) => state.Skills);
+    const employees = useAppSelector((state) => state.Employees);
     const [selectedSkills, setSelectedSkills] = useState<SkillOption[]>([]);
     const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
 
-    // Dummy data for skills
-    const skillOptions: SkillOption[] = [
-        { value: 'VueJS', label: 'VueJS' },
-        { value: 'Golang', label: 'Golang' },
-        { value: 'Power BI', label: 'Power BI' },
-        { value: 'ReactJS', label: 'ReactJS' },
-        { value: 'NodeJS', label: 'NodeJS' },
-    ];
+    useEffect(() => {
+        if (!skills.data.length) {
+            dispatch(getSkills({}));
+        }
+    }, [dispatch, skills.data.length]);
 
-    // Dummy data for employees
-    const employees: Employee[] = [
-        {
-            name: 'Sandy',
-            skills: [
-                { name: 'VueJS', rate: 7 },
-                { name: 'Golang', rate: 7 },
-                { name: 'Power BI', rate: 7 },
-            ],
-        },
-        {
-            name: 'Rere',
-            skills: [
-                { name: 'VueJS', rate: 5 },
-                { name: 'Golang', rate: 5 },
-            ],
-        },
-        {
-            name: 'Abdul',
-            skills: [{ name: 'Golang', rate: 5 }],
-        },
-        {
-            name: 'Nina',
-            skills: [
-                { name: 'ReactJS', rate: 6 },
-                { name: 'NodeJS', rate: 8 },
-            ],
-        },
-        {
-            name: 'Lisa',
-            skills: [
-                { name: 'Power BI', rate: 9 },
-                { name: 'ReactJS', rate: 7 },
-            ],
-        },
-    ];
+    useEffect(() => {
+        if (!employees.data.length) {
+            dispatch(getEmployees({}));
+        }
+    }, [dispatch, employees.data.length]);
 
     const handleSkillChange = (selectedOptions: SkillOption[] | null) => {
         setSelectedSkills(selectedOptions || []);
 
         if (selectedOptions && selectedOptions.length > 0) {
-            const selectedSkillNames = selectedOptions.map((option) => option.value);
+            const selectedSkillIds = selectedOptions.map((option) => option.value);
 
-            const matchingEmployees = employees.filter((employee) => employee.skills.some((skill) => selectedSkillNames.includes(skill.name)));
+            const filtered = employees.data.filter((employee: any) =>
+                employee.skills.some((skill: any) =>
+                    selectedSkillIds.includes(skill.master_skill.id) // Menggunakan master_skill.id untuk mencocokkan skill
+                )
+            );
 
-            setFilteredEmployees(matchingEmployees);
+            setFilteredEmployees(filtered);
         } else {
             setFilteredEmployees([]);
         }
     };
+
+    const skillOptions = skills.data.map((skill: any) => ({
+        value: skill.id,
+        label: skill.name,
+    }));
 
     return (
         <div className="min-h-screen">
             <div className="rounded-lg bg-white p-6 shadow-md">
                 <h3 className="mb-6 text-2xl font-semibold text-gray-800 dark:text-white">Project Requirements</h3>
 
-                {/* Add skill dropdown */}
                 <div className="mb-6">
                     <label htmlFor="skills" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Add Skills
@@ -97,21 +90,29 @@ const SkillRequirementTabContent = () => {
                         className="react-select-container"
                         classNamePrefix="react-select"
                         placeholder="Select skills..."
+                        isLoading={skills.loading}
                     />
                 </div>
 
-                {/* Display filtered employees */}
                 <div>
                     <h4 className="mb-4 text-xl font-semibold text-gray-800 dark:text-white">Employees with Selected Skills</h4>
                     <ul>
                         {filteredEmployees.length > 0 ? (
                             filteredEmployees.map((employee) => (
-                                <li key={employee.name} className="mb-2 text-gray-700 dark:text-gray-300">
+                                <li key={employee.id} className="mb-2 text-gray-700 dark:text-gray-300">
                                     <strong>{employee.name}</strong>:{' '}
                                     {employee.skills
-                                        .filter((skill) => selectedSkills.some((selected) => selected.value === skill.name))
-                                        .map((skill) => `${skill.name} (Level ${skill.rate})`)
-                                        .join(', ')}
+                                        .filter((skill) =>
+                                            selectedSkills.some((selected) => selected.value === skill.master_skill.id)
+                                        )
+                                        .sort((a, b) => b.rate - a.rate)
+                                        .map((skill, index) => (
+                                            <span key={skill.master_skill.id || index} className={`inline-flex items-center mr-1 rounded-full px-3 py-1 text-xs font-medium ${getRateColor(skill.rate)}`}>
+                                                <span className="truncate">{skill.master_skill.name}</span>
+                                                <FaStar size={10} className="ml-2" />
+                                                <span className="ml-1 text-xs font-semibold">{skill.rate}</span>
+                                            </span>
+                                        ))}
                                 </li>
                             ))
                         ) : (
@@ -119,8 +120,12 @@ const SkillRequirementTabContent = () => {
                         )}
                     </ul>
                 </div>
+
                 <div className="mt-6 flex justify-end">
-                    <button type="submit" className="rounded-lg bg-blue-600 px-6 py-2.5 text-white shadow-md transition-all duration-200 hover:bg-blue-700">
+                    <button
+                        type="submit"
+                        className="rounded-lg bg-blue-600 px-6 py-2.5 text-white shadow-md transition-all duration-200 hover:bg-blue-700"
+                    >
                         Save
                     </button>
                 </div>
