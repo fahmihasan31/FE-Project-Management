@@ -43,7 +43,7 @@ const ProjectManagement = () => {
         dispatch(getClients({}));
     }, [dispatch]);
 
-    const filteredProjects = projectState.data?.filter((project) => project.name.toLowerCase().includes(searchTerm.toLowerCase())) || [];
+    const filteredProjects = projectState.data?.filter((project) => project.name && project.name.toLowerCase().includes(searchTerm.toLowerCase())) || [];
 
     const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
     const indexOfLastProject = currentPage * projectsPerPage;

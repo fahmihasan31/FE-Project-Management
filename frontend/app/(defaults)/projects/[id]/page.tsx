@@ -1,16 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, usePathname, useParams } from 'next/navigation';
-import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import { IoChevronBackOutline } from 'react-icons/io5';
+import { getProjects } from '@/store/slices/projects';
 import OverviewTabContent from './components/project-manage/tabContent';
 import MemberTabContent from './components/member/tabContent';
 import DocumentTabContent from './components/document/tabContent';
 import SkillRequirementTabContent from './components/skill-requirement/tabContent';
+import { useAppDispatch } from '@/hook/redux-hook';
 
 const Page = () => {
     const params = useParams();
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(getProjects({}));
+    });
 
     const [activeTab, setActiveTab] = useState('project-manage');
 
@@ -23,7 +30,7 @@ const Page = () => {
             case 'document':
                 return <DocumentTabContent />;
             case 'skill-requirement':
-                return <SkillRequirementTabContent />;
+                return <SkillRequirementTabContent projectId={params.id} />;
             default:
                 return null;
         }
@@ -58,7 +65,7 @@ const Page = () => {
                         } group inline-flex items-center border-b-2 px-1 py-4 text-sm font-medium hover:text-blue-600`}
                         onClick={() => handleTabChange('project-manage')}
                     >
-                        Project
+                        Project Detail
                     </button>
                     <button
                         className={`${

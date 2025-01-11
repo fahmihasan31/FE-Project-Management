@@ -15,7 +15,6 @@ const InitialState: EmployeeState = {
 
 export const getEmployees = createAsyncThunk('api/getEmployees', async (payload: any) => {
     const res = await Services.getEmployees(payload);
-    console.log('res employee get', res);
     return res.data.result;
 });
 

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Services from '@/services/project';
 
 interface ProjectState {
-    membersByRequirement: any;
+    requirements: any;
     loading: boolean;
     data: any[];
     error: string | null;
@@ -12,7 +12,7 @@ const InitialState: ProjectState = {
     loading: false,
     data: [],
     error: null,
-    membersByRequirement: [],
+    requirements: [],
 };
 
 // Async thunks master project
@@ -27,7 +27,6 @@ export const postProject = createAsyncThunk('api/postProject', async (payload: a
 });
 export const putProject = createAsyncThunk('api/putProject', async ({ payload, id }: { payload: any; id: number }) => {
     const res = await Services.putProject(payload, id);
-    console.log('put project', res);
     return res.data.result;
 });
 export const deleteProject = createAsyncThunk('api/deleteProject', async (id: number) => {
@@ -56,7 +55,8 @@ export const addRequirement = createAsyncThunk('api/project/addRequirement', asy
 });
 export const getRequirementsByProject = createAsyncThunk('api/project/getRequirementsByProject', async (id: number) => {
     const response = await Services.getRequirementsByProject(id);
-    return response.data;
+    console.log('get requirement', response);
+    return response.data.result;
 });
 export const deleteRequirement = createAsyncThunk('api/deleteRequirement', async (id: number) => {
     const res = await Services.deleteRequirement(id);
