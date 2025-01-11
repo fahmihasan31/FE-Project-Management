@@ -40,8 +40,8 @@ export const addDocument = createAsyncThunk('api/project/addDocument', async (pa
     return res.data.result;
 });
 export const getDocumentsByProject = createAsyncThunk('api/project/getDocumentsByProject', async (id: number) => {
-    const response = await Services.getDocumentsByProject(id);
-    return response.data.result;
+    const res = await Services.getDocumentsByProject(id);
+    return res.data.result;
 });
 export const deleteDocument = createAsyncThunk('api/deleteDocument', async (id: number) => {
     const res = await Services.deleteDocument(id);
@@ -54,9 +54,14 @@ export const addRequirement = createAsyncThunk('api/project/addRequirement', asy
     return res.data.result;
 });
 export const getRequirementsByProject = createAsyncThunk('api/project/getRequirementsByProject', async (id: number) => {
+<<<<<<< HEAD
     const response = await Services.getRequirementsByProject(id);
     console.log('get requirement', response);
     return response.data.result;
+=======
+    const res = await Services.getRequirementsByProject(id);
+    return res.data.result;
+>>>>>>> da50fbe478bb7ee8501714ceefb9830e3ed8d98d
 });
 export const deleteRequirement = createAsyncThunk('api/deleteRequirement', async (id: number) => {
     const res = await Services.deleteRequirement(id);
@@ -69,8 +74,8 @@ export const addMember = createAsyncThunk('api/project/addMember', async (payloa
     return res.data.result;
 });
 export const getMembersByProject = createAsyncThunk('api/project/getMembersByProject', async (id: number) => {
-    const response = await Services.getMembersByProject(id);
-    return response.data;
+    const res = await Services.getMembersByProject(id);
+    return res.data.result;
 });
 export const getMembersByRequirement = createAsyncThunk('api/project/getMembersByRequirement', async (id: number) => {
     const response = await Services.getMembersByRequirement(id);
@@ -79,7 +84,7 @@ export const getMembersByRequirement = createAsyncThunk('api/project/getMembersB
 });
 export const deleteMember = createAsyncThunk('api/deleteMember', async (id: number) => {
     const res = await Services.deleteMember(id);
-    return res.data.data;
+    return res.data.result;
 });
 
 // Slice

@@ -19,6 +19,9 @@ export default {
     getEmployees: async (payload: employeeData) => {
         return await api.get('/employee/', { params: payload });
     },
+    getBySkillID: async (skillID: number) => {
+        return await api.get(`/employee/by-skill-id/${skillID}`)
+    },
     postEmployees: async (payload: employeeData) => {
         return await api.post('/employee/', payload);
     },
