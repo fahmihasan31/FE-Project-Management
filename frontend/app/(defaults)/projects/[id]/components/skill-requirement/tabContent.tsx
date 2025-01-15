@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
 import { getSkills } from '@/store/slices/skills';
 import { getEmployees } from '@/store/slices/employees';
-import { addRequirement } from '@/store/slices/projects';
-import { getRequirementsByProject } from '@/store/slices/projects';
+import { addRequirement, getProjectsId } from '@/store/slices/projects';
 import { useAppDispatch, useAppSelector } from '@/hook/redux-hook';
 
 import { FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-
-type SkillOption = {
-    value: number;
-    label: string;
-};
+import { stat } from 'fs';
 
 interface EmployeeSkill {
     id: string;
@@ -29,6 +24,13 @@ interface EmployeeProps {
     skills: EmployeeSkill[];
 }
 
+interface requirementData {
+    requirement: {
+        project_id: string;
+        master_skill_id: string;
+    };
+}
+
 const getRateColor = (rate: number) => {
     if (rate <= 6) return 'bg-red-100 text-red-700';
     if (rate <= 8) return 'bg-yellow-100 text-yellow-700';
@@ -39,31 +41,31 @@ const SkillRequirementTabContent = ({ projectId }: { projectId: string | any }) 
     const dispatch = useAppDispatch();
     const skillState = useAppSelector((state) => state.Skills);
     const employeeState = useAppSelector((state) => state.Employees);
-
     const [selectedSkillIds, setSelectedSkillIds] = useState<number[]>([]);
     const [filteredEmployees, setFilteredEmployees] = useState<EmployeeProps[]>([]);
+    const manageState = useAppSelector((state) => state.Projects);
 
     useEffect(() => {
         dispatch(getSkills({}));
         dispatch(getEmployees({}));
+        const req = manageState.selectedData.requirements.map((item: any) => item.master_skill_id);
+        setSelectedSkillIds([...req]);
     }, [dispatch]);
 
-    const skillOptions: SkillOption[] = skillState.data.map((skill: { id: number; name: string }) => ({
-        value: skill.id,
-        label: skill.name,
-    }));
-
-    const handleSkillChange = (selectedOptions: SkillOption[] | null) => {
+    const handleSkillChange = (selectedOptions: any[] | null) => {
         const selectedIds = selectedOptions?.map((option) => option.value) || [];
         setSelectedSkillIds(selectedIds);
+    };
 
-        if (selectedIds.length > 0) {
-            const matchingEmployees = employeeState.data.filter((employee: EmployeeProps) => employee.skills.some((skill) => skill.master_skill && selectedIds.includes(skill.master_skill.id)));
+    useEffect(() => {
+        if (selectedSkillIds.length > 0 && employeeState.data.length > 0) {
+            const matchingEmployees = employeeState.data.filter((employee: EmployeeProps) => employee.skills.some((skill) => skill.master_skill && selectedSkillIds.includes(skill.master_skill.id)));
+            console.log('data matching', employeeState.data);
             setFilteredEmployees(matchingEmployees);
         } else {
             setFilteredEmployees([]);
         }
-    };
+    }, [selectedSkillIds, employeeState.data]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -75,12 +77,19 @@ const SkillRequirementTabContent = ({ projectId }: { projectId: string | any }) 
 
         try {
             await dispatch(addRequirement(payload));
-            console.log('Payload:', payload);
             toast.success('Skill Requirement added successfully');
         } catch (error) {
             toast.error('Failed to add Skill Requirement');
         }
     };
+
+    const skillOption2 = useMemo(() => {
+        const ops = skillState.data.map((skill) => ({
+            value: skill.id,
+            label: skill.name,
+        }));
+        return ops;
+    }, [skillState.data]);
 
     return (
         <div className="min-h-screen">
@@ -89,7 +98,16 @@ const SkillRequirementTabContent = ({ projectId }: { projectId: string | any }) 
                     <label htmlFor="skills" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Add Skills
                     </label>
-                    <Select id="skills" isMulti options={skillOptions} onChange={handleSkillChange} className="react-select-container" classNamePrefix="react-select" />
+                    <Select
+                        id="skills"
+                        isMulti
+                        options={skillOption2}
+                        onChange={handleSkillChange}
+                        className="react-select-container"
+                        classNamePrefix="react-select"
+                        placeholder="Select skill"
+                        value={skillOption2.filter((option: any) => selectedSkillIds.includes(option.value))}
+                    />
                 </div>
 
                 <div>

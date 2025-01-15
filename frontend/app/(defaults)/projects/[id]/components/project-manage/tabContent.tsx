@@ -17,25 +17,7 @@ interface projectData {
 const ProjectManage = ({ projectId }: { projectId: string | any }) => {
     const dispatch = useAppDispatch();
     const clientState = useAppSelector((state) => state.Clients);
-    const projectState = useAppSelector((state) => state.Projects);
-
-    useEffect(() => {
-        dispatch(getClients({}));
-        if (projectId) {
-            const project = projectState.data.find((projects) => projects.id === projectId);
-            if (project) {
-                setFormData({
-                    client_id: project.client_id,
-                    name: project.name,
-                    description: project.description,
-                    schedule_start: project.schedule_start,
-                    schedule_end: project.schedule_end,
-                    status: project.status,
-                    amount: project.amount,
-                });
-            }
-        }
-    }, [dispatch, projectId, projectState.data]);
+    const manageState = useAppSelector((state) => state.Projects);
 
     const [formData, setFormData] = useState<projectData>({
         client_id: '',
@@ -47,6 +29,33 @@ const ProjectManage = ({ projectId }: { projectId: string | any }) => {
         amount: 0,
     });
 
+    const formatDateForDisplay = (date: string): string => {
+        if (!date) return '';
+        const [year, month, day] = date.split('-');
+        return `${day}-${month}-${year}`;
+    };
+
+    const formatDateForStorage = (date: string): string => {
+        if (!date) return '';
+        const [day, month, year] = date.split('-');
+        return `${year}-${month}-${day}`;
+    };
+
+    useEffect(() => {
+        dispatch(getClients({}));
+        if (projectId) {
+            setFormData({
+                client_id: manageState.selectedData.client_id || '',
+                name: manageState.selectedData.name || '',
+                description: manageState.selectedData.description || '',
+                schedule_start: formatDateForDisplay(manageState.selectedData.schedule_start) || '',
+                schedule_end: formatDateForDisplay(manageState.selectedData.schedule_end) || '',
+                status: manageState.selectedData.status || '',
+                amount: manageState.selectedData.amount || '',
+            });
+        }
+    }, [dispatch, projectId, manageState.selectedData]);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 
@@ -55,34 +64,6 @@ const ProjectManage = ({ projectId }: { projectId: string | any }) => {
             [name]: name === 'amount' ? (value === '' ? 0 : parseInt(value)) : value,
         }));
     };
-
-    const formatDateForDisplay = (date: string): string => {
-        const [year, month, day] = date.split('-');
-        return `${day}-${month}-${year}`;
-    };
-
-    const formatDateForStorage = (date: string): string => {
-        const [day, month, year] = date.split('-');
-        return `${year}-${month}-${day}`;
-    };
-
-    useEffect(() => {
-        dispatch(getClients({}));
-        if (projectId) {
-            const project = projectState.data.find((projects) => projects.id === projectId);
-            if (project) {
-                setFormData({
-                    client_id: project.client_id,
-                    name: project.name,
-                    description: project.description,
-                    schedule_start: formatDateForDisplay(project.schedule_start),
-                    schedule_end: formatDateForDisplay(project.schedule_end),
-                    status: project.status,
-                    amount: project.amount,
-                });
-            }
-        }
-    }, [dispatch, projectId, projectState.data]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

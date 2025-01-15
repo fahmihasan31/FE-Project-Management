@@ -14,13 +14,16 @@ export default {
     getProjects: async (payload: ProjectPayload) => {
         return await api.get('/project/', { params: payload });
     },
-    postProject: async (payload: ProjectPayload) => {
+    getProjectsId: async (id: string) => {
+        return await api.get(`/project/${id}`);
+    },
+    postProject: async (payload: any) => {
         return await api.post('/project/', payload);
     },
     putProject: async (payload: ProjectPayload, id: number) => {
         return await api.put(`/project/${id}`, payload);
     },
-    deleteProject: async (id: number) => {
+    deleteProject: async (id: string) => {
         return await api.delete(`/project/${id}`);
     },
 
@@ -39,7 +42,7 @@ export default {
     addRequirement: async (payload: any) => {
         return await api.post('/project/requirement', payload);
     },
-    getRequirementsByProject: async (id: number) => {
+    getRequirementsByProject: async (id: string) => {
         return await api.get(`/project/requirement/${id}`);
     },
     deleteRequirement: async (id: number) => {

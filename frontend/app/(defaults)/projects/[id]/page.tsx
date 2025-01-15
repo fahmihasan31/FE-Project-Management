@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { getProjectsId, getRequirementsByProject } from '@/store/slices/projects';
 import { IoChevronBackOutline } from 'react-icons/io5';
-import { getProjects } from '@/store/slices/projects';
-import OverviewTabContent from './components/project-manage/tabContent';
+import DetailTabContent from './components/project-manage/tabContent';
 import MemberTabContent from './components/member/tabContent';
 import DocumentTabContent from './components/document/tabContent';
 import SkillRequirementTabContent from './components/skill-requirement/tabContent';
+// import OverviewTabContent from './components/project-overview/tabContent';
 import { useAppDispatch } from '@/hook/redux-hook';
 
 const Page = () => {
@@ -16,17 +17,20 @@ const Page = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(getProjects({}));
+        dispatch(getProjectsId(params.id));
+        dispatch(getRequirementsByProject(params.id));
     });
 
     const [activeTab, setActiveTab] = useState('project-manage');
 
     const renderTabContent = () => {
         switch (activeTab) {
+            // case 'project-overview':
+            //     return <OverviewTabContent projectId={params.id} />;
             case 'project-manage':
-                return <OverviewTabContent projectId={params.id} />;
+                return <DetailTabContent projectId={params.id} />;
             case 'member':
-                return <MemberTabContent />;
+                return <MemberTabContent projectId={params.id} />;
             case 'document':
                 return <DocumentTabContent />;
             case 'skill-requirement':
@@ -59,6 +63,14 @@ const Page = () => {
             {/* Tabs */}
             <div className="mb-4 border-b">
                 <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                    <button
+                        className={`${
+                            activeTab === 'project-overview' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'
+                        } group inline-flex items-center border-b-2 px-1 py-4 text-sm font-medium hover:text-blue-600`}
+                        onClick={() => handleTabChange('project-overview')}
+                    >
+                        Project Overview
+                    </button>
                     <button
                         className={`${
                             activeTab === 'project-manage' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'

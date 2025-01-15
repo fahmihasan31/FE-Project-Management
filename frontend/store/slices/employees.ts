@@ -31,7 +31,6 @@ export const postEmployees = createAsyncThunk('api/postEmployees', async (payloa
 
 export const putEmployees = createAsyncThunk('api/putEmployees', async ({ payload, id }: { payload: any; id: number }) => {
     const res = await Services.putEmployees(payload, id);
-    console.log('update data', res);
     return res.data.result;
 });
 
