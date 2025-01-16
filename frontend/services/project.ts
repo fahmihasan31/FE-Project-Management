@@ -29,7 +29,7 @@ export default {
 
     // Documents
     addDocument: async (payload: any) => {
-        return await api.post('/project/document/', payload);
+        return await api.post('/project/document', payload);
     },
     getDocumentsByProject: async (id: number) => {
         return await api.get(`/project/document/${id}`);
@@ -51,7 +51,7 @@ export default {
 
     // Employee requirements
     addMember: async (payload: any) => {
-        return await api.post('/project/member/', payload);
+        return await api.post('/project/member', payload);
     },
     getMembersByProject: async (id: number) => {
         return await api.get(`/project/member/${id}`);

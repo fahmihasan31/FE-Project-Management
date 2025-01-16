@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { getProjectsId, getRequirementsByProject } from '@/store/slices/projects';
+import { getProjectsId } from '@/store/slices/projects';
 import { IoChevronBackOutline } from 'react-icons/io5';
 import DetailTabContent from './components/project-manage/tabContent';
 import MemberTabContent from './components/member/tabContent';
@@ -18,7 +18,6 @@ const Page = () => {
 
     useEffect(() => {
         dispatch(getProjectsId(params.id));
-        dispatch(getRequirementsByProject(params.id));
     });
 
     const [activeTab, setActiveTab] = useState('project-manage');
@@ -32,7 +31,7 @@ const Page = () => {
             case 'member':
                 return <MemberTabContent projectId={params.id} />;
             case 'document':
-                return <DocumentTabContent />;
+                return <DocumentTabContent projectId={params.id} />;
             case 'skill-requirement':
                 return <SkillRequirementTabContent projectId={params.id} />;
             default:

@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Services from '@/services/project';
 
 interface ProjectState {
-    setRequirements: any;
     selectedData: any;
     loading: boolean;
     data: any[];
@@ -14,7 +13,6 @@ const InitialState: ProjectState = {
     data: [],
     error: null,
     selectedData: {},
-    setRequirements: {},
 };
 
 // Async thunks master project
@@ -28,6 +26,7 @@ export const postProject = createAsyncThunk('api/postProject', async (payload: a
 });
 export const getProjectsId = createAsyncThunk('api/getProjectsId', async (id: string | any) => {
     const res = await Services.getProjectsId(id);
+    console.log('idnya om', res);
     return res.data.result;
 });
 export const putProject = createAsyncThunk('api/putProject', async ({ payload, id }: { payload: any; id: number }) => {
@@ -229,7 +228,7 @@ const ClientsSlices = createSlice({
             })
             .addCase(getRequirementsByProject.fulfilled, (state, action) => {
                 state.loading = false;
-                state.setRequirements = action.payload;
+                state.selectedData = action.payload;
                 state.error = null;
             })
             .addCase(getRequirementsByProject.rejected, (state, action) => {

@@ -2,12 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
 import { getSkills } from '@/store/slices/skills';
 import { getEmployees } from '@/store/slices/employees';
-import { addRequirement, getProjectsId } from '@/store/slices/projects';
+import { addRequirement } from '@/store/slices/projects';
 import { useAppDispatch, useAppSelector } from '@/hook/redux-hook';
 
 import { FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { stat } from 'fs';
 
 interface EmployeeSkill {
     id: string;
@@ -60,7 +59,6 @@ const SkillRequirementTabContent = ({ projectId }: { projectId: string | any }) 
     useEffect(() => {
         if (selectedSkillIds.length > 0 && employeeState.data.length > 0) {
             const matchingEmployees = employeeState.data.filter((employee: EmployeeProps) => employee.skills.some((skill) => skill.master_skill && selectedSkillIds.includes(skill.master_skill.id)));
-            console.log('data matching', employeeState.data);
             setFilteredEmployees(matchingEmployees);
         } else {
             setFilteredEmployees([]);
@@ -84,10 +82,11 @@ const SkillRequirementTabContent = ({ projectId }: { projectId: string | any }) 
     };
 
     const skillOption2 = useMemo(() => {
-        const ops = skillState.data.map((skill) => ({
-            value: skill.id,
-            label: skill.name,
-        }));
+        const ops =
+            skillState.data.map((skill) => ({
+                value: skill.id,
+                label: skill.name,
+            })) || [];
         return ops;
     }, [skillState.data]);
 

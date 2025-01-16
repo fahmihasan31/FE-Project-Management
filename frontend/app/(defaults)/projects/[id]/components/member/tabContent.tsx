@@ -1,45 +1,72 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
 import { getEmployees } from '@/store/slices/employees';
-import { addMember, getMembersByRequirement } from '@/store/slices/projects';
+import { addMember } from '@/store/slices/projects';
 import { useAppDispatch, useAppSelector } from '@/hook/redux-hook';
+import { toast } from 'react-toastify';
 
 const MemberTabContent = ({ projectId }: { projectId: string | any }) => {
     const dispatch = useAppDispatch();
     const employeeState = useAppSelector((state) => state.Employees);
+    const manageState = useAppSelector((state) => state.Projects);
 
-    // State untuk menyimpan data yang dipilih
-    const [selectedData, setSelectedData] = useState({
-        projectManager: null,
-        businessAnalyst: null,
-        engineer: null,
-        tester: null,
-    });
+    const [selectEmp, setSelectEmp] = useState<any>({});
 
     useEffect(() => {
         dispatch(getEmployees({}));
-    }, [dispatch]);
-
-    const handleSelectChange = (role: string, selectedOption: any) => {
-        if (selectedOption) {
-            setSelectedData((prevState) => ({
-                ...prevState,
-                [role]: selectedOption,
-            }));
-
-            if (role === 'engineer' || role === 'tester') {
-                dispatch(getMembersByRequirement(projectId));
-            } else if (role === 'projectManager' || role === 'businessAnalyst') {
-                dispatch(getEmployees({}));
-            }
+        if (manageState.selectedData?.members) {
+            const initialMembers = manageState.selectedData.members.reduce((acc: any, member: any) => {
+                if (!acc[member.role]) {
+                    acc[member.role] = [];
+                }
+                acc[member.role].push(member.employee_id);
+                return acc;
+            }, {});
+            setSelectEmp(initialMembers);
+            console.log('Mapped roles to employee IDs:', initialMembers);
         }
+    }, [dispatch, manageState.selectedData]);
+
+    const handleEmpChange = (role: string) => (selectedOptions: any) => {
+        setSelectEmp((prevState: any) => ({
+            ...prevState,
+            [role]: selectedOptions ? selectedOptions.map((option: any) => option.value) : [],
+        }));
     };
 
-    // Data employee
-    const employeeOptions = employeeState.data.map((employee) => ({
-        value: employee.id,
-        label: employee.name,
-    }));
+    const employeeOptionAll = useMemo(() => {
+        return (
+            employeeState.data.map((employee: any) => ({
+                value: employee.id,
+                label: employee.name,
+            })) || []
+        );
+    }, [employeeState.data]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Convert selectEmp state to the payload structure
+        const members = Object.entries(selectEmp).flatMap(([role, employeeIds]) => {
+            return (employeeIds as string[]).map((employee_id) => ({
+                employee_id,
+                role,
+            }));
+        });
+
+        const payload = {
+            project_id: projectId,
+            members,
+        };
+
+        try {
+            await dispatch(addMember(payload));
+            toast.success('Members added successfully!');
+        } catch (error) {
+            toast.error('Failed to add members to the project.');
+            console.error('Error adding members to project:', error);
+        }
+    };
 
     return (
         <div className="min-h-screen">
@@ -52,31 +79,31 @@ const MemberTabContent = ({ projectId }: { projectId: string | any }) => {
                         Project Manager
                     </label>
                     <Select
+                        isMulti
                         id="project_manager"
                         name="project_manager"
-                        isMulti
-                        value={selectedData.projectManager}
-                        onChange={(selectedOption: any) => handleSelectChange('projectManager', selectedOption)}
-                        options={employeeOptions}
+                        value={employeeOptionAll.filter((option: any) => selectEmp.project_manager?.includes(option.value))}
+                        onChange={handleEmpChange('project_manager')}
+                        options={employeeOptionAll}
                         className="mt-1 w-full rounded border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200"
                         placeholder="Select Project Manager"
                     />
                 </div>
 
-                {/* Business Analyst */}
+                {/* business analyst */}
                 <div className="mb-4">
                     <label htmlFor="business_analyst" className="text-sm font-medium text-gray-700">
                         Business Analyst
                     </label>
                     <Select
+                        isMulti
                         id="business_analyst"
                         name="business_analyst"
-                        isMulti
-                        value={selectedData.businessAnalyst}
-                        onChange={(selectedOption: any) => handleSelectChange('businessAnalyst', selectedOption)}
-                        options={employeeOptions}
+                        value={employeeOptionAll.filter((option: any) => selectEmp.business_analyst?.includes(option.value))}
+                        onChange={handleEmpChange('business_analyst')}
+                        options={employeeOptionAll}
                         className="mt-1 w-full rounded border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200"
-                        placeholder="Select Business Analyst"
+                        placeholder="Select Project Business Analyst"
                     />
                 </div>
 
@@ -86,57 +113,39 @@ const MemberTabContent = ({ projectId }: { projectId: string | any }) => {
                         Engineer
                     </label>
                     <Select
+                        isMulti
                         id="engineer"
                         name="engineer"
-                        isMulti
-                        value={selectedData.engineer}
-                        onChange={(selectedOption: any) => handleSelectChange('engineer', selectedOption)}
-                        options={employeeOptions}
+                        value={employeeOptionAll.filter((option: any) => selectEmp.engineer?.includes(option.value))}
+                        onChange={handleEmpChange('engineer')}
+                        options={employeeOptionAll}
                         className="mt-1 w-full rounded border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200"
-                        placeholder="Select Engineer"
+                        placeholder="Select Project engineer"
                     />
                 </div>
 
-                {/* Tester */}
-                <div className="mb-6">
+                {/* tester */}
+                <div className="mb-4">
                     <label htmlFor="tester" className="text-sm font-medium text-gray-700">
                         Tester
                     </label>
                     <Select
+                        isMulti
                         id="tester"
                         name="tester"
-                        isMulti
-                        value={selectedData.tester}
-                        onChange={(selectedOption: any) => handleSelectChange('tester', selectedOption)}
-                        options={employeeOptions}
+                        value={employeeOptionAll.filter((option: any) => selectEmp.tester?.includes(option.value))}
+                        onChange={handleEmpChange('tester')}
+                        options={employeeOptionAll}
                         className="mt-1 w-full rounded border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200"
-                        placeholder="Select Tester"
+                        placeholder="Select Project tester"
                     />
                 </div>
 
                 <div className="mb-6 flex justify-end">
-                    <button type="submit" className="rounded-lg bg-blue-600 px-6 py-2.5 text-white shadow-md transition-all duration-200 hover:bg-blue-700">
+                    <button type="submit" onClick={handleSubmit} className="rounded-lg bg-blue-600 px-6 py-2.5 text-white shadow-md transition-all duration-200 hover:bg-blue-700">
                         Save
                     </button>
                 </div>
-
-                {/* Tabel Member */}
-                <table className="min-w-full divide-y divide-gray-200 border">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Role</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
-                        {Object.entries(selectedData).map(([role, member]: any) => (
-                            <tr key={role}>
-                                <td className="whitespace-nowrap px-6 py-4 text-sm font-medium capitalize text-gray-900">{role.replace(/([A-Z])/g, ' $1')}</td>
-                                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{member && member.length > 0 ? member.map((m: any) => m.label).join(', ') : 'Not Assigned'}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
             </div>
         </div>
     );

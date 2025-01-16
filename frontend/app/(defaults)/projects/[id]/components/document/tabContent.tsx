@@ -1,16 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-// import { DocumentTextIcon } from '@heroicons/react/solid';
 import { IoDocumentText } from 'react-icons/io5';
+import { useAppDispatch, useAppSelector } from '@/hook/redux-hook';
+import { addDocument } from '@/store/slices/projects';
+import http from '@/services/http/api';
 
 interface DocumentData {
-    name: string;
-    url: string;
+    path: string;
 }
 
-const DocumentManage = () => {
-    const [documents, setDocuments] = useState<DocumentData[]>([]);
+const DocumentManage = ({ projectId }: { projectId: string | any }) => {
+    const dispatch = useAppDispatch();
+    const manageState = useAppSelector((state) => state.Projects);
+    const [documents, setDocuments] = useState<any[]>([]);
     const [file, setFile] = useState<File | null>(null);
+
+    useEffect(() => {
+        const req = manageState.selectedData.documents.map((item: any) => item.path);
+        setDocuments([...req]);
+        console.log('isi document', req);
+    }, manageState.selectedData);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
@@ -19,20 +28,27 @@ const DocumentManage = () => {
         }
     };
 
-    const handleSave = () => {
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
         if (!file) {
-            toast.error('Please upload a file first.');
+            toast.error('Please select a file to upload.');
             return;
         }
 
-        const newDocument = {
-            name: file.name,
-            url: URL.createObjectURL(file),
-        };
+        const formData = new FormData();
+        formData.append('project_id', projectId);
+        formData.append('file', file);
 
-        setDocuments((prev) => [...prev, newDocument]);
-        setFile(null);
-        toast.success('Document uploaded successfully.');
+        try {
+            await dispatch(addDocument(formData));
+            console.log('data apa ini', formData);
+
+            toast.success('Document uploaded successfully!');
+        } catch (error) {
+            toast.error('Failed to upload document');
+            console.error('Upload error:', error);
+        }
     };
 
     return (
@@ -50,28 +66,23 @@ const DocumentManage = () => {
 
                 {/* Save Button */}
                 <div className="mb-6 flex justify-end">
-                    <button onClick={handleSave} className="rounded-lg bg-blue-600 px-6 py-2.5 text-white shadow-md transition-all duration-200 hover:bg-blue-700">
+                    <button onClick={handleSubmit} className="rounded-lg bg-blue-600 px-6 py-2.5 text-white shadow-md transition-all duration-200 hover:bg-blue-700">
                         Save
                     </button>
                 </div>
 
-                {/* Uploaded Documents */}
-                <div>
-                    <h3 className="mb-4 text-xl font-semibold text-gray-600">Uploaded Documents</h3>
-                    {documents.length === 0 ? (
-                        <p className="text-gray-500">No documents uploaded yet.</p>
-                    ) : (
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                            {documents.map((doc, index) => (
-                                <div key={index} className="flex flex-col items-center justify-center rounded-md border bg-gray-50 p-4 shadow-sm hover:shadow-md">
-                                    <IoDocumentText className="h-12 w-8 text-blue-500" />
-                                    <a href={doc.url} download={doc.name} className="mt-2 text-center text-sm font-medium text-blue-600 hover:underline">
-                                        {doc.name}
-                                    </a>
-                                </div>
-                            ))}
+                {/* Display Uploaded Documents */}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+                    {documents.map((doc, index) => (
+                        <div key={index} className="rounded-lg border bg-white p-4 shadow-md">
+                            <div className="flex items-center space-x-2">
+                                <IoDocumentText size={24} className="text-blue-600" />
+                            </div>
+                            <div className="mt-4 text-sm text-gray-600">
+                                <p className="truncate">{doc}</p>
+                            </div>
                         </div>
-                    )}
+                    ))}
                 </div>
             </div>
         </div>
